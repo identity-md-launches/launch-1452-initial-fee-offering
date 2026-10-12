@@ -8,6 +8,7 @@ import {IERC20Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.so
 import {IFOToken} from "../src/IFOToken.sol";
 import {TokenFactory} from "./helpers/TokenFactory.sol";
 
+/// forge-config: default.fuzz.runs = 1000
 contract IFOTokenTest is Test {
     uint256 internal constant SUPPLY = 1_000_000_000 * 10 ** 18;
 
@@ -352,7 +353,7 @@ contract IFOTokenTest is Test {
     }
 
     function testFuzz_TransfersConserveSupply(uint256 rawAmount, address recipient) public {
-        vm.assume(recipient != address(0));
+        recipient = address(uint160(bound(uint160(recipient), 1, type(uint160).max)));
         uint256 amount = bound(rawAmount, 0, SUPPLY);
         assertTrue(token.transfer(recipient, amount));
         if (recipient == address(this)) {
